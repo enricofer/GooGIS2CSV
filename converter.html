@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.4/papaparse.min.js"></script>
+<script src="https://raw.githubusercontent.com/imaya/zlib.js/master/bin/zip.min.js"></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 <script type="text/javascript">
 
@@ -27,6 +27,25 @@ function init() {
 function showInfo(data, tabletop) {
     alert('Successfully processed!')
     console.log(data);
+    var header = Object.keys(data[0]);
+    header.splice(header.indexOf('STATUS'), 1);
+    header.splice(header.indexOf('FEATUREID'), 1);
+    header.splice(header.indexOf('WKTGEOMETRY'), 1);
+    header_text = 'WKT,'+header.toString();
+    console.log(header_text);
+    document.write(header_text);
+    var i, k, rows = data.length, columns = header.length
+    for (i=0; i<rows; ++i) {
+        row = data[i];
+        var inflate = new Zlib.Inflate(atob(row.WKTGEOMETRY));
+        var row_txt = inflate.decompress();
+        for (k=0; k<columns; ++k) {
+            row_txt += row[header[k]];
+        }
+        console.log(row_txt);
+        document.write(row_txt);
+        
+    }
 }
 
 window.addEventListener('DOMContentLoaded', init)
