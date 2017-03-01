@@ -49,7 +49,7 @@ function showInfo(data, tabletop) {
         // Convert gunzipped byteArray back to ascii string:
         var row_txt     = String.fromCharCode.apply(null, new Uint16Array(data));
         for (k=0; k<columns; ++k) {
-            row_txt += ','row[header[k]];
+            row_txt += ','+row[header[k]];
         }
         console.log(row_txt);
         //document.write(row_txt);
