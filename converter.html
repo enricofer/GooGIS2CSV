@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://raw.githubusercontent.com/imaya/zlib.js/master/bin/rawinflate.min.js"></script>
+<script src="https://rawgithub.com/nodeca/pako/master/dist/pako.js"></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 <script type="text/javascript">
 
@@ -37,8 +37,16 @@ function showInfo(data, tabletop) {
     var i, k, rows = data.length, columns = header.length
     for (i=0; i<rows; ++i) {
         row = data[i];
-        var inflate = new Zlib.RawInflate(atob(row.WKTGEOMETRY));
-        var row_txt = inflate.decompress();
+        // Decode base64 (convert ascii to binary)
+        var strData     = atob(row.WKTGEOMETRY);
+        // Convert binary string to character-number array
+        var charData    = strData.split('').map(function(x){return x.charCodeAt(0);});
+        // Turn number array into byte-array
+        var binData     = new Uint8Array(charData);
+        // Pako magic
+        var inflated        = pako.inflate(binData);
+        // Convert gunzipped byteArray back to ascii string:
+        var row_txt     = String.fromCharCode.apply(null, new Uint16Array(data));
         for (k=0; k<columns; ++k) {
             row_txt += row[header[k]];
         }
