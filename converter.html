@@ -1,0 +1,44 @@
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+<script src="https://github.com/mholt/PapaParse/blob/master/papaparse.min.js"></script>
+<script type="text/javascript">
+
+
+
+var spreadsheet_id = gup('spreadsheet_id');
+var sheet_id = gup('sheet_id');
+
+download_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/export?format=csv&id='+ spreadsheet_id
+
+if (sheet_id != ''){download_url += '&gid='+ sheet_id}
+
+Papa.parse(download_url, {
+    complete: function(results) {
+        console.log(results);
+    }
+});
+
+        
+
+function gup(name) {
+  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regexS = "[\\?&]"+name+"=([^&#]*)";
+  var regex = new RegExp( regexS );
+  var results = regex.exec( window.location.href );
+  if( results == null )
+    return "";
+  else
+    return results[1];
+}
+    
+</script>
+
+</head>
+
+<body>
+
+</body>
+</html>
