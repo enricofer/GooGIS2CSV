@@ -11,16 +11,22 @@ var spreadsheet_id = gup('spreadsheet_id');
 var sheet_id = gup('sheet_id');
 
 download_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/export?format=csv&id='+ spreadsheet_id
-
-if (sheet_id != ''){download_url += '&gid='+ sheet_id}
-
+    
+if (sheet_id != ""){download_url += '&gid='+ sheet_id}
+download_url += '&callback=googleDocCallback'
+    
+console.log (download_url);
+    
 Papa.parse(download_url, {
-    complete: function(results) {
-        console.log(results);
+        download: true
+    },
+    {
+        complete: function(results) {
+            console.log(results);
     }
 });
 
-        
+window.googleDocCallback = function () { return true; };        
 
 function gup(name) {
   name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
