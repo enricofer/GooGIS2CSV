@@ -37,7 +37,7 @@ function showInfo(data, tabletop) {
     var i, k, rows = data.length, columns = header.length
     for (i=0; i<rows; ++i) {
         row = data[i];
-        var inflate = new Zlib.Inflate(atob(row.WKTGEOMETRY));
+        var inflate = new Zlib.RawInflate(atob(row.WKTGEOMETRY));
         var row_txt = inflate.decompress();
         for (k=0; k<columns; ++k) {
             row_txt += row[header[k]];
