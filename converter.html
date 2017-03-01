@@ -33,11 +33,10 @@ function showInfo(data, tabletop) {
     header.splice(header.indexOf('WKTGEOMETRY'), 1);
     header_text = 'WKT,'+header.toString();
     console.log(header_text);
-    document.write(header_text);
+    document.write(header_text+'\n');
     var i, k, rows = data.length, columns = header.length
     for (i=0; i<rows; ++i) {
         row = data[i];
-        console.log(row);
         // Decode base64 (convert ascii to binary)
         var strData     = atob(row.WKTGEOMETRY);
         // Convert binary string to character-number array
@@ -47,12 +46,18 @@ function showInfo(data, tabletop) {
         // Pako magic
         var inflated        = pako.inflate(binData);
         // Convert gunzipped byteArray back to ascii string:
-        var row_txt     = String.fromCharCode.apply(null, new Uint16Array(data));
+        var wkt_txt = String.fromCharCode.apply(null, new Uint16Array(inflated));
+        var row_txt = '"'+wkt_txt+'"'
         for (k=0; k<columns; ++k) {
-            row_txt += ','+row[header[k]];
+            if (typeof row[header[k]] == 'string'){
+                var quote = '"';
+            } else {
+                var quote = '';
+            }
+            row_txt += ','+quote+row[header[k]]+quote;
         }
         //console.log(row_txt);
-        document.write(row_txt);
+        document.write(row_txt+'\n');
         
     }
 }
