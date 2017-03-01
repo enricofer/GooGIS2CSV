@@ -25,7 +25,7 @@ function init() {
 }
 
 function showInfo(data, tabletop) {
-    alert('Successfully processed!')
+    //alert('Successfully processed!')
     console.log(data);
     var header = Object.keys(data[0]);
     header.splice(header.indexOf('STATUS'), 1);
@@ -33,7 +33,7 @@ function showInfo(data, tabletop) {
     header.splice(header.indexOf('WKTGEOMETRY'), 1);
     header_text = 'WKT,'+header.toString();
     console.log(header_text);
-    //document.write(header_text);
+    document.write(header_text);
     var i, k, rows = data.length, columns = header.length
     for (i=0; i<rows; ++i) {
         row = data[i];
@@ -51,8 +51,8 @@ function showInfo(data, tabletop) {
         for (k=0; k<columns; ++k) {
             row_txt += ','+row[header[k]];
         }
-        console.log(row_txt);
-        //document.write(row_txt);
+        //console.log(row_txt);
+        document.write(row_txt);
         
     }
 }
