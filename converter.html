@@ -33,7 +33,7 @@ function showInfo(data, tabletop) {
     header.splice(header.indexOf('WKTGEOMETRY'), 1);
     header_text = 'WKT,'+header.toString();
     console.log(header_text);
-    document.writeln(header_text+'\n');
+    document.writeln(header_text);
     var i, k, rows = data.length, columns = header.length
     for (i=0; i<rows; ++i) {
         row = data[i];
@@ -57,7 +57,7 @@ function showInfo(data, tabletop) {
             row_txt += ','+quote+row[header[k]]+quote;
         }
         //console.log(row_txt);
-        document.writeln(row_txt+'\n');
+        document.writeln(row_txt);
         
     }
 }
