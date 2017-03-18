@@ -19,16 +19,6 @@
     display: none;
 }
 </style>
-<script src='http://requirejs.org/docs/release/2.2.0/minified/require.js'></script>
-<script type="text/javascript">
-    
-define(['underscore', 'util', 'path', 'xml2js', 'fs'], function (dynModules) {
-    for(name in dynModules) {   
-        var module = require(path); // Call RequireJS require
-    }
-});
-  
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://rawgithub.com/nodeca/pako/master/dist/pako.js"></script>
@@ -202,6 +192,7 @@ function ol_init(){
       })
       */
     });
+    init()
 }
     
 </script>
