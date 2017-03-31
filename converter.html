@@ -35,9 +35,11 @@ var spreadsheet_id = gup('spreadsheet_id');
 var layer_projection, view_projection = 'EPSG:3857'
 
 ol.proj.setProj4(proj4);
+
+window.googleDocCallback = function () { return true; };
     
 //var public_html_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?gid='+ sheet_id +'&single=true';
-var public_html_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml';
+var public_html_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback';
 
     
 console.log (public_html_url);
