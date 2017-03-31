@@ -109,21 +109,23 @@ function showInfo(data, tabletop) {
     console.log(getTransformationOptions());
     for (i=0; i<rows; ++i) {
         row = data[sheet_name].elements[i];
-        var wkt_txt = decompress(row.WKTGEOMETRY);
-        var ol_feature = WKT_format.readFeature(wkt_txt, getTransformationOptions());
-        ol_feature.setId(parseInt(row.FEATUREID));
-        delete(row.FEATUREID);delete(row.WKTGEOMETRY);delete(row.STATUS);
-        ol_feature.setProperties(row);
-        //console.log(GeoJSON_format.writeFeature(ol_feature));
-        collection.push(ol_feature);
-        var row_txt = '"'+wkt_txt+'"'
-        for (k=0; k<columns; ++k) {
-            if (typeof row[header[k]] == 'string'){
-                var quote = '"';
-            } else {
-                var quote = '';
+        if (row.STATUS != 'D'){
+            var wkt_txt = decompress(row.WKTGEOMETRY);
+            var ol_feature = WKT_format.readFeature(wkt_txt, getTransformationOptions());
+            ol_feature.setId(parseInt(row.FEATUREID));
+            delete(row.FEATUREID);delete(row.WKTGEOMETRY);delete(row.STATUS);
+            ol_feature.setProperties(row);
+            //console.log(GeoJSON_format.writeFeature(ol_feature));
+            collection.push(ol_feature);
+            var row_txt = '"'+wkt_txt+'"'
+            for (k=0; k<columns; ++k) {
+                if (typeof row[header[k]] == 'string'){
+                    var quote = '"';
+                } else {
+                    var quote = '';
+                }
+                row_txt += ','+quote+row[header[k]]+quote;
             }
-            row_txt += ','+quote+row[header[k]]+quote;
         }
         //console.log(row_txt);
         //document.writeln(row_txt);
