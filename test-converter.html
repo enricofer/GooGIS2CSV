@@ -27,7 +27,6 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js'></script>
 <script src='https://rawgit.com/enricofer/geojson_viewer/master/epsg.js'></script>
-<script src='/olms.js'></script>
 <script type="text/javascript">
   
 var spreadsheet_id = gup('spreadsheet_id');
@@ -87,78 +86,8 @@ function showInfo(data, tabletop) {
     //alert('Successfully processed!')
     $('#downloading').css('display', 'none');
     $('.progress').css('display', 'block');
-    //console.log(tabletop);
-    //console.log(data);
-    var sheet_name = tabletop.googleSheetName;
-    var header = data[sheet_name].columnNames;
-    header.splice(header.indexOf('STATUS'), 1);
-    header.splice(header.indexOf('FEATUREID'), 1);
-    header.splice(header.indexOf('WKTGEOMETRY'), 1);
-    header_text = 'WKT,'+header.toString();
-    console.log(header_text);
-    
-    layer_projection = data.settings.elements[0].s1;
-    registerEPSGId(layer_projection);
-    var sld_style = decompress(data.settings.elements[2].s1);
-    console.log(sld_style);
-    
-    var $progressBar = $('.progress-bar');
-    var WKT_format = new ol.format.WKT();
-    var GeoJSON_format = new ol.format.GeoJSON();
-    var collection = new ol.Collection();
-    var i, k, rows = data[sheet_name].elements.length, columns = header.length;
-    console.log(getTransformationOptions());
-    for (i=0; i<rows; ++i) {
-        row = data[sheet_name].elements[i];
-        if (row.STATUS != 'D'){
-            var wkt_txt = decompress(row.WKTGEOMETRY);
-            var ol_feature = WKT_format.readFeature(wkt_txt, getTransformationOptions());
-            ol_feature.setId(parseInt(row.FEATUREID));
-            delete(row.FEATUREID);delete(row.WKTGEOMETRY);delete(row.STATUS);
-            ol_feature.setProperties(row);
-            //console.log(GeoJSON_format.writeFeature(ol_feature));
-            collection.push(ol_feature);
-            var row_txt = '"'+wkt_txt+'"'
-            for (k=0; k<columns; ++k) {
-                if (typeof row[header[k]] == 'string'){
-                    var quote = '"';
-                } else {
-                    var quote = '';
-                }
-                row_txt += ','+quote+row[header[k]]+quote;
-            }
-        }
-        //console.log(row_txt);
-        //document.writeln(row_txt);
-        setTimeout(function(){
-            progress_percent = Math.trunc(i*100/rows);
-            $progressBar.css('width', progress_percent.toString()+'%');
-        }, 50);
-            
-    }
-      
-    var googis_layer = new ol.layer.Vector({
-        source: new ol.source.Vector({
-            features: collection,
-            projection: view_projection
-        }),
-        title: 'GooGIS LAYER',
-        map: googis_map,
-        visible: true,
-        style: new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 0, 0.4)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#ffff00',
-                width: 3
-            })
-        })
-    });
-
-    var googis_extent = googis_layer.getSource().getExtent();
-    googis_map.getView().fit(googis_extent, googis_map.getSize());
-    
+    console.log(tabletop);
+    console.log(data);
     $('.progress').css('display', 'none');
     $('#completed').css('display', 'block');
 }
