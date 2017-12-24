@@ -27,6 +27,7 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js'></script>
 <script src='https://raw.githubusercontent.com/enricofer/geojson_viewer/master/epsg.js'></script>
+<script src='/olms.js'></script>
 <script type="text/javascript">
   
 var spreadsheet_id = gup('spreadsheet_id');
@@ -131,6 +132,10 @@ function showInfo(data, tabletop) {
         }, 50);
             
     }
+    console.log("E adesso stile");
+    console.log(data['settings'].elements);
+    mbstyle = decompress(data['settings'].elements[4][0]);
+    console.log(mbstyle); 
       
     var googis_layer = new ol.layer.Vector({
         source: new ol.source.Vector({
