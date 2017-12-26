@@ -139,6 +139,8 @@ function showInfo(data, tabletop) {
     console.log("E adesso stile");
     console.log(data['settings'].elements);
     mbstyle = decompress(data['settings'].elements[3].s1);
+    mbstyle.layers[0].source = 'googis';
+    mbstyle.layers[0].id = 'googis';
     console.log(mbstyle); 
     
     
@@ -150,6 +152,8 @@ function showInfo(data, tabletop) {
         title: 'GooGIS LAYER',
         map: googis_map,
         visible: true,
+        style: olms.getStyleFunction(mbstyle, 'googis')
+        /*
         style: new ol.style.Style({
             fill: new ol.style.Fill({
                 color: 'rgba(255, 255, 0, 0.4)'
@@ -159,6 +163,7 @@ function showInfo(data, tabletop) {
                 width: 3
             })
         })
+        */
     });
 
     var googis_extent = googis_layer.getSource().getExtent();
