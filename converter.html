@@ -27,7 +27,7 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js'></script>
 <script src='https://rawgit.com/enricofer/geojson_viewer/master/epsg.js'></script>
-<script src='/olms.js'></script>
+<script src='olms.js'></script>
 <script type="text/javascript">
   
 var spreadsheet_id = gup('spreadsheet_id');
@@ -88,7 +88,7 @@ function showInfo(data, tabletop) {
     $('#downloading').css('display', 'none');
     $('.progress').css('display', 'block');
     //console.log(tabletop);
-    //console.log(data);
+    console.log(data);
     var sheet_name = tabletop.googleSheetName;
     var header = data[sheet_name].columnNames;
     header.splice(header.indexOf('STATUS'), 1);
@@ -138,7 +138,7 @@ function showInfo(data, tabletop) {
     
     console.log("E adesso stile");
     console.log(data['settings'].elements);
-    mbstyle = decompress(data['settings'].elements[4][0]);
+    mbstyle = decompress(data['settings'].elements[3].s1);
     console.log(mbstyle); 
     
     
