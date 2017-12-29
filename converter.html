@@ -6,6 +6,8 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.0.1/ol.css" type="text/css">
+<link rel="stylesheet" href="https://unpkg.com/ol-popup@2.0.0/src/ol-popup.css">
+<link rel="stylesheet" href="http://rawgit.com/walkermatt/ol3-layerswitcher/master/src/ol3-layerswitcher.css" />
 <style>
 .progress, .alert {
     margin: 15px;
@@ -19,6 +21,21 @@
 #downloading {
     display: none;
 }
+    
+.layer-switcher {
+    top: 3em;
+    bottom:unset;
+}
+    
+.ol-popup-content {
+    min-width: 300px;
+    max-height: 400px;
+    overflow-x: auto;
+}
+
+.ol-popup-content td {
+    vertical-align:top;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -29,24 +46,20 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js'></script>
 <script src='https://rawgit.com/enricofer/geojson_viewer/master/epsg.js'></script>
 <script src='olms.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/ol3-layerswitcher@1.1.2/src/ol3-layerswitcher.js"></script>
+<script src="https://unpkg.com/ol-popup@2.0.0"></script>
 <script type="text/javascript">
   
-var spreadsheet_id = gup('spreadsheet_id');
+var sheets_ids = gup('spreadsheet_id');
 //var sheet_id = gup('sheet_id');
 //var epsg_id = gup('epsg');
 var layer_projection, view_projection = 'EPSG:3857'
+var layerSwitcher,getfeature_popup;
 
 ol.proj.setProj4(proj4);
 
 window.googleDocCallback = function () { return true; };
-    
-//var public_html_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?gid='+ sheet_id +'&single=true';
-var public_html_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback';
 
-    
-console.log (public_html_url);
-
-    
 function registerEPSGId(epsg_id){
     if (epsg_id != 'EPSG:3858' && epsg_id != 'EPSG:4326'){
         var layer_projection = epsg_id
@@ -57,9 +70,9 @@ function registerEPSGId(epsg_id){
     }
 }
 
-function init() {
+function load_googis_sheet(spreadsheet_id) {
     $('#downloading').css('display', 'block');
-    Tabletop.init( { key: public_html_url,
+    Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback',
                      callback: showInfo,
                      simpleSheet: false } )
 }
@@ -100,8 +113,7 @@ function showInfo(data, tabletop) {
     
     layer_projection = data.settings.elements[0].s1;
     registerEPSGId(layer_projection);
-    var sld_style = decompress(data.settings.elements[2].s1);
-    console.log(sld_style);
+    //var sld_style = decompress(data.settings.elements[2].s1);
     
     var $progressBar = $('.progress-bar');
     var WKT_format = new ol.format.WKT();
@@ -137,12 +149,12 @@ function showInfo(data, tabletop) {
         }, 50);    
     }
     
-    console.log("E adesso stile");
-    console.log(data['settings'].elements);
     mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
-    console.log(mbstyle.layers[0]); 
+    console.log(decompress(data['settings'].elements[3].s1)); 
     mbstyle.layers[0].source = 'googis';
     mbstyle.layers[0].id = 'googis';
+    mbstyle.layers[0].paint["line-width"] = 1.0
+    mbstyle.layers[0].paint["line-color"] = "#98A020"
     console.log(mbstyle); 
     
     
@@ -151,8 +163,7 @@ function showInfo(data, tabletop) {
             features: collection,
             projection: view_projection
         }),
-        title: 'GooGIS LAYER',
-        map: googis_map,
+        title: sheet_name,
         visible: true,
         style: new ol.style.Style({
             fill: new ol.style.Fill({
@@ -164,17 +175,59 @@ function showInfo(data, tabletop) {
             })
         })
     });
-
-    olms.applyStyle(googis_layer, mbstyle, 'googis')
+    
+    googis_map.addLayer(googis_layer);
+    
+    olms.applyStyle(googis_layer, mbstyle, 'googis');
         
     var googis_extent = googis_layer.getSource().getExtent();
     googis_map.getView().fit(googis_extent, googis_map.getSize());
+    
+    getfeature_popup = new ol.Overlay.Popup();
+    googis_map.addOverlay(getfeature_popup);
+    
+    //layerSwitcher.renderPanel();
+    
+    googis_map.on('click', function(evt) {
+
+        // Hide existing popup and reset it's offset
+        getfeature_popup.hide();
+        getfeature_popup.setOffset([0, 0]);
+
+        // Attempt to find a feature in one of the visible vector layers
+        var feature = googis_map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            return feature;
+        });
+
+        if (feature) {
+
+            var coord = feature.getGeometry().getFirstCoordinate();//getCoordinates();
+            var props = feature.getProperties();
+            var info = '<div class="xxx"><small><table>';
+
+            for (var key in props) {
+                if (props.hasOwnProperty(key)&&(key !='geometry')) {
+                    info += "<tr>"
+                    info += "<td><strong>" + key + "</strong></td>"
+                    info += '<td style="padding-left:8px;">' + props[key] + '</td>';
+                    info += "</tr>"
+                }
+            }
+
+            info += "</table></small></div>";
+
+            getfeature_popup.setOffset([0, -21]);
+            getfeature_popup.show(coord, info);
+
+        }
+
+    });
     
     $('.progress').css('display', 'none');
     $('#completed').css('display', 'block');
 }
 
-window.addEventListener('DOMContentLoaded', init)
+//window.addEventListener('DOMContentLoaded', init)
       
 
 function gup(name) {
@@ -208,7 +261,17 @@ function ol_init(){
       })
       */
     });
-    init()
+    
+    layerSwitcher = new ol.control.LayerSwitcher({
+        tipLabel: 'Legenda' // Optional label for button
+    });
+    googis_map.addControl(layerSwitcher);
+    
+    var ids = sheets_ids.split(",");
+    for (id of ids) {
+        load_googis_sheet(id)
+    }
+    
 }
     
 </script>
