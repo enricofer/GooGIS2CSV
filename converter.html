@@ -98,11 +98,12 @@ function decompress(b64_zipped){
 }    
 
 function showInfo(data, tabletop) {
-    console.log(data);
-    var sheet_name = tabletop.googleSheetName;
-    $('#downloading '+sheet_name).css('display', 'none');
+    //alert('Successfully processed!')
+    $('#downloading').css('display', 'none');
     $('.progress').css('display', 'block');
     //console.log(tabletop);
+    console.log(data);
+    var sheet_name = tabletop.googleSheetName;
     var header = data[sheet_name].columnNames;
     header.splice(header.indexOf('STATUS'), 1);
     header.splice(header.indexOf('FEATUREID'), 1);
@@ -150,7 +151,10 @@ function showInfo(data, tabletop) {
     
     mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
     console.log(decompress(data['settings'].elements[3].s1)); 
-    mbstyle.sprite = "mapbox://sprites/mapbox/streets-v8";
+    mbstyle.layers[0].source = 'googis';
+    mbstyle.layers[0].id = 'googis';
+    console.log(mbstyle); 
+    
     
     var googis_layer = new ol.layer.Vector({
         source: new ol.source.Vector({
@@ -170,11 +174,10 @@ function showInfo(data, tabletop) {
         })
     });
     
-    
     googis_map.addLayer(googis_layer);
     
-    olms.applyStyle(googis_layer, mbstyle, mbstyle.layers[0].id);
-    
+    olms.applyStyle(googis_layer, mbstyle, 'googis');
+        
     var googis_extent = googis_layer.getSource().getExtent();
     googis_map.getView().fit(googis_extent, googis_map.getSize());
     
@@ -263,7 +266,6 @@ function ol_init(){
     googis_map.addControl(layerSwitcher);
     
     var ids = sheets_ids.split(",");
-    console.log(ids);
     for (id of ids) {
         load_googis_sheet(id)
     }
