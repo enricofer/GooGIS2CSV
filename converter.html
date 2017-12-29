@@ -100,7 +100,7 @@ function decompress(b64_zipped){
 function showInfo(data, tabletop) {
     console.log(data);
     var sheet_name = tabletop.googleSheetName;
-    $('#downloading '+sheet_name).css('display', 'none');
+    $('#downloading').css('display', 'none');
     $('.progress').css('display', 'block');
     //console.log(tabletop);
     var header = data[sheet_name].columnNames;
@@ -151,7 +151,7 @@ function showInfo(data, tabletop) {
     mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
     console.log(decompress(data['settings'].elements[3].s1)); 
     mbstyle.sprite = "mapbox://sprites/mapbox/streets-v8";
-    for (var i=0, l=mbstyle.layers.length; i<l; i++)(layer of mbstyle.layers) {
+    for (var i=0, l=mbstyle.layers.length; i<l; i++) {
         layer = mbstyle.layers[i];
         layer.source = 'googis'+i.toString();
         layer.id = 'googis'+i.toString(); 
