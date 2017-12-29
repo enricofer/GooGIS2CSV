@@ -151,34 +151,35 @@ function showInfo(data, tabletop) {
     mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
     console.log(decompress(data['settings'].elements[3].s1)); 
     mbstyle.sprite = "mapbox://sprites/mapbox/streets-v8";
-    for (layer of mbstyle.layers) {
-        layer.source = 'googis';
-        layer.id = 'googis';
-    }
-    console.log(mbstyle); 
+    for (var i=0, l=mbstyle.layers.length; i<l; i++)(layer of mbstyle.layers) {
+        layer = mbstyle.layers[i];
+        layer.source = 'googis'+i.toString();
+        layer.id = 'googis'+i.toString(); 
     
-    var googis_layer = new ol.layer.Vector({
-        source: new ol.source.Vector({
-            features: collection,
-            projection: view_projection
-        }),
-        title: sheet_name,
-        visible: true,
-        style: new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 0, 0.4)'
+        var googis_layer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: collection,
+                projection: view_projection
             }),
-            stroke: new ol.style.Stroke({
-                color: '#ffff00',
-                width: 3
+            title: sheet_name+i.toString(),
+            visible: true,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 0, 0.4)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#ffff00',
+                    width: 3
+                })
             })
-        })
-    });
+        });
+
+
+        googis_map.addLayer(googis_layer);
+        olms.applyStyle(googis_layer, mbstyle, 'googis'+i.toString();
+    }
     
-    
-    googis_map.addLayer(googis_layer);
-    
-    olms.applyStyle(googis_layer, mbstyle, 'googis');
+    console.log(mbstyle);
     
     
         
