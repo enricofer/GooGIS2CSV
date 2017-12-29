@@ -100,7 +100,7 @@ function decompress(b64_zipped){
 function showInfo(data, tabletop) {
     console.log(data);
     var sheet_name = tabletop.googleSheetName;
-    $('#downloading').css('display', 'none');
+    $('#downloading '+sheet_name).css('display', 'none');
     $('.progress').css('display', 'block');
     //console.log(tabletop);
     var header = data[sheet_name].columnNames;
@@ -150,39 +150,31 @@ function showInfo(data, tabletop) {
     
     mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
     console.log(decompress(data['settings'].elements[3].s1)); 
-    mbstyle.sprite = "mapbox://sprites/mapbox/streets-v8";
-    for (var i=0, l=mbstyle.layers.length; i<l; i++) {
-        //layer = mbstyle.layers[i];
-        //layer.source = 'googis'+i.toString();
-        //layer.id = 'googis'+i.toString(); 
+    mbstyle.sprite = "mapbox://sprites/mapbox/streets-v8",
     
-        var googis_layer = new ol.layer.Vector({
-            source: new ol.source.Vector({
-                features: collection,
-                projection: view_projection
+    var googis_layer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            features: collection,
+            projection: view_projection
+        }),
+        title: sheet_name,
+        visible: true,
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 0, 0.4)'
             }),
-            title: mbstyle.layers[i].id,
-            visible: true,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: 'rgba(255, 255, 0, 0.4)'
-                }),
-                stroke: new ol.style.Stroke({
-                    color: '#ffff00',
-                    width: 3
-                })
+            stroke: new ol.style.Stroke({
+                color: '#ffff00',
+                width: 3
             })
-        });
-
-
-        googis_map.addLayer(googis_layer);
-        olms.applyStyle(googis_layer, mbstyle, mbstyle.layers[i].id);
-    }
-    
-    console.log(mbstyle);
+        })
+    });
     
     
-        
+    googis_map.addLayer(googis_layer);
+    
+    olms.applyStyle(googis_layer, mbstyle, mbstyle.layers[0].id);
+    
     var googis_extent = googis_layer.getSource().getExtent();
     googis_map.getView().fit(googis_extent, googis_map.getSize());
     
