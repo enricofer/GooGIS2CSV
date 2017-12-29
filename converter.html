@@ -150,7 +150,7 @@ function showInfo(data, tabletop) {
     
     mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
     console.log(decompress(data['settings'].elements[3].s1)); 
-    mbstyle.sprite = "mapbox://sprites/mapbox/streets-v8",
+    mbstyle.sprite = "mapbox://sprites/mapbox/streets-v8";
     
     var googis_layer = new ol.layer.Vector({
         source: new ol.source.Vector({
