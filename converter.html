@@ -72,7 +72,7 @@ function registerEPSGId(epsg_id){
 
 function load_googis_sheet(spreadsheet_id) {
     $('#downloading').css('display', 'block');
-    Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/e/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback',
+    Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback',
                      callback: showInfo,
                      simpleSheet: false } )
 }
