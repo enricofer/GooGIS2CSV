@@ -44,10 +44,15 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.0.1/ol.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js'></script>
+
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Object.assign"></script>
 <script src='epsg.js'></script>
 <script src='olms.js'></script>
-<script src="https://cdn.jsdelivr.net/npm/ol3-layerswitcher@1.1.2/src/ol3-layerswitcher.js"></script>
-<script src="https://unpkg.com/ol-popup@2.0.0"></script>
+
+<!-- ol-ext -->
+<link rel="stylesheet" href="ol-ext.css" />
+<script type="text/javascript" src="ol-ext.js"></script>
+
 <script type="text/javascript">
   
 var sheets_ids = gup('spreadsheet_id');
@@ -243,12 +248,24 @@ function ol_init(){
     googis_map = new ol.Map({
       layers: [
             new ol.layer.Tile({
+              title: "Stamen Toner",
+              baseLayer: true,
+              source: new ol.source.Stamen({
+                  layer: 'toner'
+              })
+            }),
+            new ol.layer.Tile({
+              title: "OSM",
+              baseLayer: true,
+              visible: false,
               source: new ol.source.OSM()
-            })
+            }),
       ],
       controls: ol.control.defaults().extend([
         new ol.control.MousePosition(),
-        new ol.control.OverviewMap()
+        new ol.control.OverviewMap(),
+        new ol.control.LayerPopup(),
+        new ol.control.LayerSwitcher()
       ]),
       target: 'map',
       /*
@@ -260,10 +277,10 @@ function ol_init(){
       */
     });
     
-    layerSwitcher = new ol.control.LayerSwitcher({
-        tipLabel: 'Legenda' // Optional label for button
-    });
-    googis_map.addControl(layerSwitcher);
+    //layerSwitcher = new ol.control.LayerSwitcher({
+    //    tipLabel: 'Legenda' // Optional label for button
+    //});
+    //googis_map.addControl(layerSwitcher);
     
     var ids = sheets_ids.split(",");
     for (id of ids) {
