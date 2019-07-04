@@ -57,6 +57,7 @@ body {
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js'></script>
 <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Object.assign"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
 
 <script src='olms.js'></script>
 
@@ -70,7 +71,6 @@ var sheets_ids = gup('spreadsheet_id');
 
 var layer_projection, view_projection = 'EPSG:3857'
 var getfeature_popup;
-
 
 window.googleDocCallback = function () { return true; };
 

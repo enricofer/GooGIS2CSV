@@ -4,7 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.0.1/ol.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-crisp/resources/theme-crisp-all.css"/>
 <style>
 .progress, .alert {
     margin: 15px;
@@ -18,197 +20,66 @@
 #downloading {
     display: none;
 }
+    
+.layer-switcher {
+    top: 3em;
+    bottom:unset;
+}
+    
+.ol-popup-content {
+    min-width: 300px;
+    max-height: 400px;
+    overflow-x: auto;
+}
+
+.ol-popup-content td {
+    vertical-align:top;
+}
+
+.ol-layerswitcher .panel li label {
+    max-width: unset !important;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://rawgithub.com/nodeca/pako/master/dist/pako.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.0.1/ol.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js'></script>
-<script src='https://raw.githubusercontent.com/enricofer/geojson_viewer/master/epsg.js'></script>
-<script src='/olms.js'></script>
-<script type="text/javascript">
-  
-var spreadsheet_id = gup('spreadsheet_id');
-//var sheet_id = gup('sheet_id');
-//var epsg_id = gup('epsg');
-var layer_projection, view_projection = 'EPSG:3857'
 
-ol.proj.setProj4(proj4);
-    
-//var public_html_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?gid='+ sheet_id +'&single=true';
-var public_html_url = 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml';
 
-    
-console.log (public_html_url);
+<!-- ol-ext -->
+<link rel="stylesheet" href="ol-ext.css" />
 
-    
-function registerEPSGId(epsg_id){
-    if (epsg_id != 'EPSG:3858' && epsg_id != 'EPSG:4326'){
-        var layer_projection = epsg_id
-        var newProjection = new ol.proj.Projection({
-            code: layer_projection
-        });
-        ol.proj.addProjection(newProjection);
-    }
-}
-
-function init() {
-    $('#downloading').css('display', 'block');
-    Tabletop.init( { key: public_html_url,
-                     callback: showInfo,
-                     simpleSheet: false } )
-}
-
-function getTransformationOptions(){
-    return {
-        dataProjection: layer_projection,
-        featureProjection:view_projection
-    }
-}
-
-function decompress(b64_zipped){
-    // Decode base64 (convert ascii to binary)
-    var strData     = atob(b64_zipped);
-    // Convert binary string to character-number array
-    var charData    = strData.split('').map(function(x){return x.charCodeAt(0);});
-    // Turn number array into byte-array
-    var binData     = new Uint8Array(charData);
-    // Pako magic
-    var inflated    = pako.inflate(binData);
-    // Convert gunzipped byteArray back to ascii string:
-    return String.fromCharCode.apply(null, new Uint16Array(inflated));
-}    
-
-function showInfo(data, tabletop) {
-    //alert('Successfully processed!')
-    $('#downloading').css('display', 'none');
-    $('.progress').css('display', 'block');
-    //console.log(tabletop);
-    //console.log(data);
-    var sheet_name = tabletop.googleSheetName;
-    var header = data[sheet_name].columnNames;
-    header.splice(header.indexOf('STATUS'), 1);
-    header.splice(header.indexOf('FEATUREID'), 1);
-    header.splice(header.indexOf('WKTGEOMETRY'), 1);
-    header_text = 'WKT,'+header.toString();
-    console.log(header_text);
-    
-    layer_projection = data.settings.elements[0].s1;
-    registerEPSGId(layer_projection);
-    var sld_style = decompress(data.settings.elements[2].s1);
-    console.log(sld_style);
-    
-    var $progressBar = $('.progress-bar');
-    var WKT_format = new ol.format.WKT();
-    var GeoJSON_format = new ol.format.GeoJSON();
-    var collection = new ol.Collection();
-    var i, k, rows = data[sheet_name].elements.length, columns = header.length;
-    console.log(getTransformationOptions());
-    for (i=0; i<rows; ++i) {
-        row = data[sheet_name].elements[i];
-        var wkt_txt = decompress(row.WKTGEOMETRY);
-        var ol_feature = WKT_format.readFeature(wkt_txt, getTransformationOptions());
-        ol_feature.setId(parseInt(row.FEATUREID));
-        delete(row.FEATUREID);delete(row.WKTGEOMETRY);delete(row.STATUS);
-        ol_feature.setProperties(row);
-        //console.log(GeoJSON_format.writeFeature(ol_feature));
-        collection.push(ol_feature);
-        var row_txt = '"'+wkt_txt+'"'
-        for (k=0; k<columns; ++k) {
-            if (typeof row[header[k]] == 'string'){
-                var quote = '"';
-            } else {
-                var quote = '';
-            }
-            row_txt += ','+quote+row[header[k]]+quote;
-        }
-        //console.log(row_txt);
-        //document.writeln(row_txt);
-        setTimeout(function(){
-            progress_percent = Math.trunc(i*100/rows);
-            $progressBar.css('width', progress_percent.toString()+'%');
-        }, 50);
-            
-    }
-    console.log("E adesso stile");
-    console.log(data['settings'].elements);
-    mbstyle = decompress(data['settings'].elements[4][0]);
-    console.log(mbstyle); 
-      
-    var googis_layer = new ol.layer.Vector({
-        source: new ol.source.Vector({
-            features: collection,
-            projection: view_projection
-        }),
-        title: 'GooGIS LAYER',
-        map: googis_map,
-        visible: true,
-        style: new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 0, 0.4)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#ffff00',
-                width: 3
-            })
-        })
-    });
-
-    var googis_extent = googis_layer.getSource().getExtent();
-    googis_map.getView().fit(googis_extent, googis_map.getSize());
-    
-    $('.progress').css('display', 'none');
-    $('#completed').css('display', 'block');
-}
-
-window.addEventListener('DOMContentLoaded', init)
-      
-
-function gup(name) {
-  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-  var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  if( results == null )
-    return "";
-  else
-    return results[1];
-}
-
-function ol_init(){
-    googis_map = new ol.Map({
-      layers: [
-            new ol.layer.Tile({
-              source: new ol.source.OSM()
-            })
-      ],
-      controls: ol.control.defaults().extend([
-        new ol.control.MousePosition(),
-        new ol.control.OverviewMap()
-      ]),
-      target: 'map',
-      /*
-      view: new ol.View({
-        projection:view_projection,
-        center: [11,45],
-        zoom: 3
-      })
-      */
-    });
-}
-    
-</script>
 
 </head>
 
-<body onload="ol_init()">
-<div style="width:100%;height:600px" id="map"></div>
-<div class="progress">
-    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-</div>
-<div id="downloading" class="alert alert-success" role="alert">Downloading</div>
-<div id="completed" class="alert alert-success" role="alert">Loading completed!</div>
+</body>
+</html>
+
+<body>
+
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+    </div>
+    <div id="downloading" class="alert alert-success" role="alert">Downloading</div>
+    <div id="completed" class="alert alert-success" role="alert">Loading completed!</div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.10/pako.js"></script>
+    <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
+    <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
+    <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js'></script>
+    <script type="text/javascript" src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Object.assign"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script type="text/javascript" src="ol-ext.js"></script>
+    <script type="text/javascript" src='olms.js'></script>
+    <script>
+        Ext.Loader.setConfig({
+            enabled: true,
+            paths: {
+                'GeoExt': 'https://rawgit.com/geoext/geoext3/master/src/'
+            }
+        });
+    </script>
+
+    <script src="mapper_ext.js" ></script>
 </body>
 </html>
