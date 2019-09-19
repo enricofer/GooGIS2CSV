@@ -194,7 +194,7 @@ function showInfo(data, tabletop) {
     
     var mbstyle_source = decompress(data['settings'].elements[3].s1)
     var mbstyle = JSON.parse(mbstyle_source);//.replace(sheet_name,"googis"));
-    mbstyle.sources = "";
+    //mbstyle.sources = "";
     delete mbstyle.sprite;
     console.log(mbstyle);
     
