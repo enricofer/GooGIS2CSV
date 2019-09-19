@@ -164,7 +164,7 @@ function showInfo(data, tabletop) {
         }, 50);    
     }
     
-    mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
+    var mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
     console.log(decompress(data['settings'].elements[3].s1)); 
     //mbstyle.layers[0].source = 'googis';
     //mbstyle.layers[0].id = 'googis';
