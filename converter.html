@@ -190,7 +190,7 @@ function showInfo(data, tabletop) {
         })
     });
     
-    googis_map.addLayer(googis_layer);
+    
     
     var mbstyle_source = decompress(data['settings'].elements[3].s1)
     var mbstyle = JSON.parse(mbstyle_source.replace(sheet_name,"googis"));
@@ -199,7 +199,7 @@ function showInfo(data, tabletop) {
     console.log(mbstyle);
     
     olms.applyStyle(googis_layer, mbstyle, "googis").then(function() {
-                  googis_layer.setVisible(false);
+                  googis_map.addLayer(googis_layer);
                 }, function(e) {
                   console.error(e);
                 });
