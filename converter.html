@@ -164,12 +164,12 @@ function showInfo(data, tabletop) {
         }, 50);    
     }
     
-    var mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
-    console.log(decompress(data['settings'].elements[3].s1)); 
+    //var mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
+    //console.log(decompress(data['settings'].elements[3].s1)); 
     //mbstyle.layers[0].source = 'googis';
     //mbstyle.layers[0].id = 'googis';
-    mbstyle.sprite = "";
-    console.log(mbstyle.sprite); 
+    //mbstyle.sprite = "";
+    //console.log(mbstyle.sprite); 
     
     
     var googis_layer = new ol.layer.Vector({
@@ -192,8 +192,13 @@ function showInfo(data, tabletop) {
     
     googis_map.addLayer(googis_layer);
     
+	
+    var mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
+    delete mbstyle.sprite;
+    console.log(mbstyle.sprite);
+    
     olms.applyStyle(googis_layer, mbstyle, 'googis');
-        
+       
     var googis_extent = googis_layer.getSource().getExtent();
     googis_map.getView().fit(googis_extent, googis_map.getSize());
     
