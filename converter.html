@@ -194,8 +194,10 @@ function showInfo(data, tabletop) {
     
 	
     var mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
+    mbstyle.layers[0].source = 'googis';
+    mbstyle.layers[0].id = 'googis';
     delete mbstyle.sprite;
-    console.log(mbstyle.sprite);
+    console.log(mbstyle);
     
     olms.applyStyle(googis_layer, mbstyle, 'googis');
        
