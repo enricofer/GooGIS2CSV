@@ -198,8 +198,12 @@ function showInfo(data, tabletop) {
     delete mbstyle.sprite;
     console.log(mbstyle);
     
-    var prom = olms.applyStyle(googis_layer, mbstyle, "googis");
-    console.log(prom);
+    olms.applyStyle(googis_layer, mbstyle, "googis").then(function() {
+                  googis_layer.setVisible(false);
+                }, function(e) {
+                  console.error(e);
+                });
+    
        
     var googis_extent = googis_layer.getSource().getExtent();
     googis_map.getView().fit(googis_extent, googis_map.getSize());
