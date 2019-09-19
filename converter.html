@@ -198,7 +198,7 @@ function showInfo(data, tabletop) {
     delete mbstyle.sprite;
     console.log(mbstyle);
     
-    olms.applyStyle(googis_layer, mbstyle, sheet_name).then(function() {
+    olms.applyStyle(googis_layer, mbstyle, "").then(function() {
                   googis_map.addLayer(googis_layer);
                 }, function(e) {
                   console.error(e);
