@@ -194,8 +194,7 @@ function showInfo(data, tabletop) {
     
 	
     var mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
-    var layer_name = mbstyle.name
-    mbstyle.sources[mbstyle.name] = 'geojson';
+    mbstyle.sources = "";
     delete mbstyle.sprite;
     console.log(mbstyle);
     
