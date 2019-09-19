@@ -193,12 +193,12 @@ function showInfo(data, tabletop) {
     googis_map.addLayer(googis_layer);
     
     var mbstyle_source = decompress(data['settings'].elements[3].s1)
-    var mbstyle = JSON.parse(mbstyle_source);
+    var mbstyle = JSON.parse(mbstyle_source.replace(sheet_name,"googis"));
     mbstyle.sources = "";
     delete mbstyle.sprite;
     console.log(mbstyle);
     
-    olms.applyStyle(googis_layer, mbstyle);
+    olms.applyStyle(googis_layer, mbstyle, "googis");
        
     var googis_extent = googis_layer.getSource().getExtent();
     googis_map.getView().fit(googis_extent, googis_map.getSize());
