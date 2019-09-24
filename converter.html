@@ -190,7 +190,7 @@ function showInfo(data, tabletop) {
     delete mbstyle.sprite;
     
     olms.applyStyle(googis_layer, mbstyle, sheet_name).then(function() {
-                  console.error("OK loaded style");
+                  console.log("OK loaded style");
                 }, function(e) {
                   console.error(e);
                 });
