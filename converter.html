@@ -156,20 +156,11 @@ function showInfo(data, tabletop) {
                 row_txt += ','+quote+row[header[k]]+quote;
             }
         }
-        //console.log(row_txt);
-        //document.writeln(row_txt);
         setTimeout(function(){
             progress_percent = Math.trunc(i*100/rows);
             $progressBar.css('width', progress_percent.toString()+'%');
         }, 50);    
     }
-    
-    //var mbstyle = JSON.parse(decompress(data['settings'].elements[3].s1));
-    //console.log(decompress(data['settings'].elements[3].s1)); 
-    //mbstyle.layers[0].source = 'googis';
-    //mbstyle.layers[0].id = 'googis';
-    //mbstyle.sprite = "";
-    //console.log(mbstyle.sprite); 
     
     
     var googis_layer = new ol.layer.Vector({
@@ -191,20 +182,19 @@ function showInfo(data, tabletop) {
     });
     
     googis_layer.set('name', sheet_name)
+    googis_map.addLayer(googis_layer);
     
     var mbstyle_source = decompress(data['settings'].elements[3].s1)
-    var mbstyle = JSON.parse(mbstyle_source);//.replace(sheet_name,"googis"));
-    mbstyle.sources[sheet_name] = sheet_name;
+    console.log(mbstyle_source)
+    var mbstyle = JSON.parse(mbstyle_source);
     delete mbstyle.sprite;
-    console.log(mbstyle);
     
     olms.applyStyle(googis_layer, mbstyle, sheet_name).then(function() {
-                  googis_map.addLayer(googis_layer);
+                  console.error("OK loaded style");
                 }, function(e) {
                   console.error(e);
                 });
     
-       
     var googis_extent = googis_layer.getSource().getExtent();
     googis_map.getView().fit(googis_extent, googis_map.getSize());
     

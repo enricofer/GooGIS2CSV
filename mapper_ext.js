@@ -51,6 +51,7 @@ Ext.application({
 
         function load_googis_sheet(spreadsheet_id) {
             $('#downloading').css('display', 'block');
+            console.log('https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback');
             Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback',
                             callback: showInfo,
                             simpleSheet: false } )
@@ -70,15 +71,16 @@ Ext.application({
             public_layers = {};
             var data_array = data["keys"].toArray();
             var i, k, rows = data_array.length;
+            console.log(data_array);
             for (i=0; i<rows; ++i) {
                 row = data_array[i];
                 var metadata = JSON.parse(decompress(row[1]))
+                console.log(row[0],metadata);
                 if ('extent' in metadata) {
                     var extent_txt = "[" + metadata.extent.replace(/\s/g,",").replace(",,",",") + "]"
                     var extent = JSON.parse(extent_txt)
                     metadata.fid = row[0]
                     public_layers[row[0]] = metadata;
-                    console.log(metadata);
                     var extent_geom = ol.geom.Polygon.fromExtent(extent);
                     var pub_layer_feat = new ol.Feature({
                         geometry: extent_geom.transform(layer_projection,view_projection),
