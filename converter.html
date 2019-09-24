@@ -87,6 +87,7 @@ function load_googis_sheet(spreadsheet_id) {
     $('#downloading').css('display', 'block');
     Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/'+ spreadsheet_id +'/pubhtml?callback=googleDocCallback',
                      callback: showInfo,
+                     parseNumbers: true,
                      simpleSheet: false } )
 }
 
@@ -182,15 +183,16 @@ function showInfo(data, tabletop) {
     });
     
     googis_layer.set('name', sheet_name)
-    googis_map.addLayer(googis_layer);
     
-    var mbstyle_source = decompress(data['settings'].elements[3].s1)
-    console.log(mbstyle_source)
+    var mbstyle_source = decompress(data['settings'].elements[3].s1);
+    console.log(mbstyle_source);
     var mbstyle = JSON.parse(mbstyle_source);
-    delete mbstyle.sprite;
+    mbstyle.sources[sheet_name] = {"type":"vector"};
+    mbstyle.sprite = "";
     
     olms.applyStyle(googis_layer, mbstyle, sheet_name).then(function() {
                   console.log("OK loaded style");
+                  googis_map.addLayer(googis_layer);
                 }, function(e) {
                   console.error(e);
                 });
